@@ -5,37 +5,24 @@ import random from "random";
 
 const path = "./data.json";
 
-const markCommit = (x, y) => {
-  const date = moment()
-    .subtract(1, "y")
-    .add(1, "d")
-    .add(x, "w")
-    .add(y, "d")
-    .format();
-
-  const data = {
-    date: date,
-  };
-
-  jsonfile.writeFile(path, data, () => {
-    simpleGit().add([path]).commit(date, { "--date": date }).push();
-  });
-};
+const startDate = moment("2024-08-05");
+const endDate = moment("2025-08-01");
+const totalDays = endDate.diff(startDate, "days");
 
 const makeCommits = (n) => {
-  if(n===0) return simpleGit().push();
-  const x = random.int(0, 54);
-  const y = random.int(0, 6);
-  const date = moment().subtract(1, "y").add(1, "d").add(x, "w").add(y, "d").format();
+  if (n === 0) return simpleGit().push();
 
-  const data = {
-    date: date,
-  };
-  console.log(date);
+  const randomOffset = random.int(0, totalDays);
+  const commitDate = moment(startDate).add(randomOffset, "days").format();
+
+  const data = { date: commitDate };
+  console.log(commitDate);
+
   jsonfile.writeFile(path, data, () => {
-    simpleGit().add([path]).commit(date, { "--date": date },makeCommits.bind(this,--n));
+    simpleGit()
+      .add([path])
+      .commit(commitDate, { "--date": commitDate }, makeCommits.bind(this, --n));
   });
 };
 
-makeCommits(100);
-
+makeCommits(500);
